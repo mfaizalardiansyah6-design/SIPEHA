@@ -1,6 +1,13 @@
 import Alpine from 'alpinejs';
 import ApexCharts from 'apexcharts';
 import { Calendar } from 'fullcalendar';
+import themePlugin from 'fullcalendar/themes/pulse';
+import dayGridPlugin from 'fullcalendar/daygrid';
+import listPlugin from 'fullcalendar/list';
+
+import 'fullcalendar/skeleton.css';
+import 'fullcalendar/themes/pulse/theme.css';
+import 'fullcalendar/themes/pulse/palettes/blue.css';
 
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/600.css';
@@ -74,6 +81,7 @@ Alpine.data('fullCalendar', (sourceId, extraEventsId) => ({
             extraEvents = read(extraEventsId);
         }
         const calendar = new Calendar(this.$refs.container, {
+            plugins: [themePlugin, dayGridPlugin, listPlugin],
             initialView: 'dayGridMonth',
             headerToolbar: {
                 left: 'prev,next today',
@@ -83,6 +91,23 @@ Alpine.data('fullCalendar', (sourceId, extraEventsId) => ({
             height: 'auto',
             events: [...events, ...extraEvents],
             eventDisplay: 'block',
+
+            // Stable class hooks so app.css can style the calendar with the app's design tokens
+            viewClass: 'fc-view-app',
+            toolbarClass: 'fc-toolbar-app',
+            toolbarSectionClass: 'fc-toolbar-section-app',
+            toolbarTitleClass: 'fc-title-app',
+            buttonClass: 'fc-btn-app',
+            buttonGroupClass: 'fc-btngroup-app',
+            tableHeaderClass: 'fc-tableheader-app',
+            tableBodyClass: 'fc-tablebody-app',
+            dayHeaderClass: 'fc-dayheader-app',
+            dayCellClass: 'fc-daycell-app',
+            rowEventClass: 'fc-event-app',
+            listDayClass: 'fc-listday-app',
+            listDayHeaderClass: 'fc-listdayheader-app',
+            listItemEventClass: 'fc-listitem-app',
+            noEventsClass: 'fc-noevents-app',
         });
         calendar.render();
     },

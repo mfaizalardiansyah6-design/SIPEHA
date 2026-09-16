@@ -24,7 +24,7 @@ class JadwalController extends Controller
             ->get()
             ->map(fn ($event) => [
                 'title' => "{$event->total} sesi",
-                'date' => $event->tanggal->toDateString(),
+                'start' => $event->tanggal->toDateString(),
                 'allDay' => true,
             ])
             ->values()
