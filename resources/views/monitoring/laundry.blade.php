@@ -1,7 +1,7 @@
-<x-app-layout title="Pencucian Baju">
-    <x-page-header title="Pencucian Baju" description="Pantau pemenuhan hak pencucian baju warga binaan">
+<x-app-layout title="Layanan Laundry">
+    <x-page-header title="Layanan Laundry" description="Pantau pemenuhan hak layanan laundry warga binaan">
         <x-slot:actions>
-            <form method="GET" action="{{ route('monitoring.cucian') }}" class="flex items-center gap-2">
+            <form method="GET" action="{{ route('monitoring.laundry') }}" class="flex items-center gap-2">
                 <input type="date" name="tanggal" value="{{ $tanggal }}" class="form-input w-full sm:!w-44" onchange="this.form.submit()">
             </form>
         </x-slot:actions>
@@ -11,8 +11,8 @@
         <div class="card card-padding xl:col-span-2">
             <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
                 <div>
-                    <h2>Status Pencucian {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d M Y') }}</h2>
-                    <p class="text-sm text-muted mt-0.5">Perbarui status pencucian setiap WBP</p>
+                    <h2>Status Laundry {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d M Y') }}</h2>
+                    <p class="text-sm text-muted mt-0.5">Perbarui status laundry setiap WBP</p>
                 </div>
 
                 <div class="flex items-center gap-2">
@@ -74,7 +74,7 @@
         </div>
 
         <div class="card card-padding h-fit">
-            <h2 class="mb-4">Ringkasan Pencucian</h2>
+            <h2 class="mb-4">Ringkasan Laundry</h2>
 
             <div class="mb-4">
                 <div class="flex items-end justify-between mb-2">

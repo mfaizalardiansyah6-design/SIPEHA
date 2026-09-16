@@ -33,7 +33,7 @@ class MonitoringController extends Controller
     /**
      * Simpan atau perbarui status monitoring untuk satu WBP pada satu
      * kategori di tanggal tertentu (upsert). Dipakai oleh halaman
-     * perawatan, alat ibadah, senam, dan pencucian.
+     * perawatan, pemeriksaan kesehatan, dan layanan laundry.
      */
     public function setStatus(Request $request): RedirectResponse
     {

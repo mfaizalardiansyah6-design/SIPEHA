@@ -74,7 +74,6 @@
                     $perawatanItems = [
                         'potong-rambut' => 'Potong Rambut',
                         'potong-kuku' => 'Potong Kuku',
-                        'kebutuhan-mandi' => 'Kebutuhan Mandi',
                     ];
                 @endphp
                 <div data-menu="perawatan" data-open="{{ $isPerawatan ? 'true' : 'false' }}">
@@ -103,14 +102,14 @@
                     </div>
                 </div>
 
-                @php $isAlat = $routeName === 'monitoring.alat-ibadah'; @endphp
-                <a href="{{ route('monitoring.alat-ibadah') }}"
-                   class="nav-sub {{ $isAlat ? 'nav-active' : '' }}">
-                    @if ($isAlat)
+                @php $isKesehatan = $routeName === 'monitoring.pemeriksaan-kesehatan'; @endphp
+                <a href="{{ route('monitoring.pemeriksaan-kesehatan') }}"
+                   class="nav-sub {{ $isKesehatan ? 'nav-active' : '' }}">
+                    @if ($isKesehatan)
                         <span class="absolute left-0 inset-y-0 w-[3px] bg-primary"></span>
                     @endif
-                    <x-icon name="church" class="w-5 h-5 shrink-0" />
-                    <span>Alat Ibadah</span>
+                    <x-icon name="activity" class="w-5 h-5 shrink-0" />
+                    <span>Pemeriksaan Kesehatan</span>
                 </a>
 
                 @php $isBuku = str_starts_with($routeName ?? '', 'monitoring.buku'); @endphp
@@ -123,24 +122,14 @@
                     <span>Peminjaman Buku</span>
                 </a>
 
-                @php $isSenam = $routeName === 'monitoring.senam'; @endphp
-                <a href="{{ route('monitoring.senam') }}"
-                   class="nav-sub {{ $isSenam ? 'nav-active' : '' }}">
-                    @if ($isSenam)
-                        <span class="absolute left-0 inset-y-0 w-[3px] bg-primary"></span>
-                    @endif
-                    <x-icon name="activity" class="w-5 h-5 shrink-0" />
-                    <span>Senam</span>
-                </a>
-
-                @php $isCucian = $routeName === 'monitoring.cucian'; @endphp
-                <a href="{{ route('monitoring.cucian') }}"
-                   class="nav-sub {{ $isCucian ? 'nav-active' : '' }}">
-                    @if ($isCucian)
+                @php $isLaundry = $routeName === 'monitoring.laundry'; @endphp
+                <a href="{{ route('monitoring.laundry') }}"
+                   class="nav-sub {{ $isLaundry ? 'nav-active' : '' }}">
+                    @if ($isLaundry)
                         <span class="absolute left-0 inset-y-0 w-[3px] bg-primary"></span>
                     @endif
                     <x-icon name="shirt" class="w-5 h-5 shrink-0" />
-                    <span>Pencucian Baju</span>
+                    <span>Layanan Laundry</span>
                 </a>
             </div>
         </div>

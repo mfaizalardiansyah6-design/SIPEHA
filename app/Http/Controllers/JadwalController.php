@@ -18,8 +18,8 @@ class JadwalController extends Controller
             ->get();
 
         $events = MonitoringLog::selectRaw('tanggal, count(*) as total')
-            ->whereDate('tanggal', '>=', today()->subDays(45))
-            ->whereDate('tanggal', '<=', today()->addDays(45))
+            ->whereDate('tanggal', '>=', today()->subDays(30))
+            ->whereDate('tanggal', '<=', today()->addDays(30))
             ->groupBy('tanggal')
             ->get()
             ->map(fn ($event) => [

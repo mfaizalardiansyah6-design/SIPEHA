@@ -1,7 +1,7 @@
-<x-app-layout title="Senam">
-    <x-page-header title="Senam" description="Presensi kegiatan senam warga binaan">
+<x-app-layout title="Pemeriksaan Kesehatan">
+    <x-page-header title="Pemeriksaan Kesehatan" description="Presensi pemeriksaan kesehatan warga binaan">
         <x-slot:actions>
-            <form method="GET" action="{{ route('monitoring.senam') }}" class="flex items-center gap-2">
+            <form method="GET" action="{{ route('monitoring.pemeriksaan-kesehatan') }}" class="flex items-center gap-2">
                 <input type="date" name="tanggal" value="{{ $tanggal }}" class="form-input w-full sm:!w-44" onchange="this.form.submit()">
             </form>
         </x-slot:actions>
@@ -12,7 +12,7 @@
             <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
                 <div>
                     <h2>Presensi {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d M Y') }}</h2>
-                    <p class="text-sm text-muted mt-0.5">Tandai kehadiran setiap WBP</p>
+                    <p class="text-sm text-muted mt-0.5">Tandai kehadiran pemeriksaan kesehatan setiap WBP</p>
                 </div>
 
                 <div class="flex items-center gap-2">

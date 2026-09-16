@@ -13,7 +13,7 @@ use Illuminate\View\View;
 
 class PerawatanController extends Controller
 {
-    private const SLUGS = ['potong-rambut', 'potong-kuku', 'kebutuhan-mandi'];
+    private const SLUGS = ['potong-rambut', 'potong-kuku'];
 
     public function index(Request $request): View
     {

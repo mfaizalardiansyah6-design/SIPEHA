@@ -3,7 +3,7 @@
                    description="Pantau pemenuhan hak perawatan diri seluruh WBP">
 
         <x-slot:actions>
-            @php $tabs = ['potong-rambut' => 'Potong Rambut', 'potong-kuku' => 'Potong Kuku', 'kebutuhan-mandi' => 'Kebutuhan Mandi']; @endphp
+            @php $tabs = ['potong-rambut' => 'Potong Rambut', 'potong-kuku' => 'Potong Kuku']; @endphp
             <div class="flex items-center gap-1 rounded-lg bg-ink/5 p-1 overflow-x-auto max-w-full">
                 @foreach ($tabs as $slug => $label)
                     <a href="{{ route('monitoring.perawatan', ['tab' => $slug]) }}"

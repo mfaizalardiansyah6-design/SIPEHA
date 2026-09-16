@@ -30,9 +30,8 @@ enum MonitoringStatus: string
     public static function optionsFor(string $categorySlug): array
     {
         return match ($categorySlug) {
-            'senam' => ['Hadir', 'Tidak Hadir', 'Izin'],
-            'pencucian-baju' => ['Proses', 'Selesai'],
-            'alat-ibadah' => ['Diterima', 'Belum Diterima'],
+            'pemeriksaan-kesehatan' => ['Hadir', 'Tidak Hadir', 'Izin'],
+            'layanan-laundry' => ['Proses', 'Selesai'],
             default => ['Selesai', 'Belum'],
         };
     }

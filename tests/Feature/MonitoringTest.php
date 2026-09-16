@@ -23,7 +23,7 @@ class MonitoringTest extends TestCase
         parent::setUp();
 
         $this->petugas = User::factory()->create();
-        $this->category = ServiceCategory::factory()->create(['slug' => 'senam']);
+        $this->category = ServiceCategory::factory()->create(['slug' => 'pemeriksaan-kesehatan']);
     }
 
     public function test_set_status_creates_log_for_wbp_and_category(): void

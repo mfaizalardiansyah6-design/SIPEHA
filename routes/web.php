@@ -4,12 +4,11 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\Monitoring\AlatIbadahController;
+use App\Http\Controllers\Monitoring\KesehatanController;
+use App\Http\Controllers\Monitoring\LaundryController;
 use App\Http\Controllers\Monitoring\MonitoringController;
 use App\Http\Controllers\Monitoring\PeminjamanBukuController;
-use App\Http\Controllers\Monitoring\PencucianController;
 use App\Http\Controllers\Monitoring\PerawatanController;
-use App\Http\Controllers\Monitoring\SenamController;
 use App\Http\Controllers\Monitoring\VideoCallController;
 use App\Http\Controllers\PetugasController;
 use App\Http\Controllers\ProfileController;
@@ -50,10 +49,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/monitoring/video-call', [VideoCallController::class, 'index'])->name('monitoring.video-call');
     Route::get('/monitoring/video-call/export', [VideoCallController::class, 'export'])->name('monitoring.video-call.export');
     Route::get('/monitoring/perawatan', [PerawatanController::class, 'index'])->name('monitoring.perawatan');
-    Route::get('/monitoring/alat-ibadah', [AlatIbadahController::class, 'index'])->name('monitoring.alat-ibadah');
+    Route::get('/monitoring/pemeriksaan-kesehatan', [KesehatanController::class, 'index'])->name('monitoring.pemeriksaan-kesehatan');
     Route::get('/monitoring/peminjaman-buku', [PeminjamanBukuController::class, 'index'])->name('monitoring.buku');
-    Route::get('/monitoring/senam', [SenamController::class, 'index'])->name('monitoring.senam');
-    Route::get('/monitoring/pencucian-baju', [PencucianController::class, 'index'])->name('monitoring.cucian');
+    Route::get('/monitoring/layanan-laundry', [LaundryController::class, 'index'])->name('monitoring.laundry');
 
     Route::post('/monitoring', [MonitoringController::class, 'store'])->name('monitoring.store');
     Route::post('/monitoring/set-status', [MonitoringController::class, 'setStatus'])->name('monitoring.set-status');

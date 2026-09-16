@@ -13,11 +13,9 @@ class ServiceCategorySeeder extends Seeder
             ['nama_layanan' => 'Video Call', 'slug' => 'video-call', 'tipe_layanan' => 'harian'],
             ['nama_layanan' => 'Potong Rambut', 'slug' => 'potong-rambut', 'tipe_layanan' => 'mingguan'],
             ['nama_layanan' => 'Potong Kuku', 'slug' => 'potong-kuku', 'tipe_layanan' => 'mingguan'],
-            ['nama_layanan' => 'Kebutuhan Mandi', 'slug' => 'kebutuhan-mandi', 'tipe_layanan' => 'harian'],
-            ['nama_layanan' => 'Alat Ibadah', 'slug' => 'alat-ibadah', 'tipe_layanan' => 'harian'],
+            ['nama_layanan' => 'Pemeriksaan Kesehatan', 'slug' => 'pemeriksaan-kesehatan', 'tipe_layanan' => 'harian'],
             ['nama_layanan' => 'Peminjaman Buku', 'slug' => 'peminjaman-buku', 'tipe_layanan' => 'harian'],
-            ['nama_layanan' => 'Senam', 'slug' => 'senam', 'tipe_layanan' => 'mingguan'],
-            ['nama_layanan' => 'Pencucian Baju', 'slug' => 'pencucian-baju', 'tipe_layanan' => 'harian'],
+            ['nama_layanan' => 'Layanan Laundry', 'slug' => 'layanan-laundry', 'tipe_layanan' => 'harian'],
         ];
 
         foreach ($categories as $category) {

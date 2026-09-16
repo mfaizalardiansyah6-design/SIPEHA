@@ -11,11 +11,11 @@ use App\Models\Wbp;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class SenamController extends Controller
+class LaundryController extends Controller
 {
     public function index(Request $request): View
     {
-        $category = ServiceCategory::where('slug', 'senam')->firstOrFail();
+        $category = ServiceCategory::where('slug', 'layanan-laundry')->firstOrFail();
         $tanggal = $request->date('tanggal')?->toDateString() ?? today()->toDateString();
 
         $wbps = Wbp::where('status', WbpStatus::Aktif->value)
@@ -30,9 +30,9 @@ class SenamController extends Controller
 
         $statusOptions = MonitoringStatus::optionsFor($category->slug);
 
-        $hadir = $logs->filter->isTerpenuhi()->count();
+        $selesai = $logs->filter->isTerpenuhi()->count();
         $total = $wbps->count();
-        $persen = $total > 0 ? (int) round(($hadir / $total) * 100) : 0;
+        $persen = $total > 0 ? (int) round(($selesai / $total) * 100) : 0;
 
         $distribusi = MonitoringLog::where('category_id', $category->id)
             ->whereDate('tanggal', $tanggal)
@@ -41,6 +41,6 @@ class SenamController extends Controller
             ->orderByDesc('total')
             ->get();
 
-        return view('monitoring.senam', compact('category', 'wbps', 'logs', 'statusOptions', 'hadir', 'total', 'persen', 'tanggal', 'distribusi'));
+        return view('monitoring.laundry', compact('category', 'wbps', 'logs', 'statusOptions', 'selesai', 'total', 'persen', 'tanggal', 'distribusi'));
     }
 }

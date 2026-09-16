@@ -79,7 +79,7 @@
                     {{ $instansi['nama'] ?? 'SIMHAK WBP' }}
                 </span>
                 <h2 class="text-white text-3xl font-semibold tracking-tight leading-tight">Monitor hak Warga Binaan dengan transparan dan terpusat</h2>
-                <p class="mt-4 text-sm text-white/60 leading-relaxed">Pencatatan digital layanan hak warga binaan — video call, perawatan diri, alat ibadah, hingga senam — dalam satu sistem.</p>
+                <p class="mt-4 text-sm text-white/60 leading-relaxed">Pencatatan digital layanan hak warga binaan — video call, perawatan diri, pemeriksaan kesehatan, hingga layanan laundry — dalam satu sistem.</p>
             </div>
         </div>
     </div>

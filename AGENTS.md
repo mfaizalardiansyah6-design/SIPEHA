@@ -14,6 +14,17 @@ php artisan test --filter=TestClassName::testMethodName  # single test
 ./vendor/bin/pint     # lint/format (Laravel Pint)
 ```
 
+## Database setup (MySQL)
+
+- Dev/production DB is **MySQL**: `.env` must set `DB_CONNECTION=mysql` (+ `DB_HOST`/`DB_PORT`/`DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD`). `.env.example` already ships MySQL values (database `semhak_db`). `.env` is gitignored and absent from the repo.
+- First run: copy `.env.example` → `.env`, adjust MySQL creds, then `php artisan key:generate && php artisan config:clear && php artisan migrate --seed`.
+- **Gotcha**: with no `.env`, config falls back to SQLite at `database/database.sqlite`, and **any** `php artisan` command fails with "Database file ... does not exist" — including `composer install`, whose `package:discover` hook boots the app and hits `Schema::hasTable('settings')`. `composer setup` cannot fix this (it runs `composer install` before the `.env` copy step). Either configure `.env` first or create the empty file:
+
+```bash
+New-Item -ItemType File -Path "database\database.sqlite"
+```
+- After `migrate --seed`, admin login is `admin@simhak.test` / `password` (all seeded petugas also use `password`).
+
 ## Architecture
 
 ### Roles & Middleware
@@ -34,10 +45,10 @@ php artisan test --filter=TestClassName::testMethodName  # single test
 - Uniqueness validated via `App\Rules\UniqueNik` rule (checks `nik_hash`), with optional `$ignoreId` for updates
 
 ### Monitoring System
-- 8 categories seeded in `ServiceCategorySeeder` (idempotent, keyed by `slug`); only 6 have dedicated pages/controllers
-- Page→controller→slug(s): `video-call`; `perawatan` (one controller, `?tab=` flips between `potong-rambut`, `potong-kuku`, `kebutuhan-mandi`); `alat-ibadah`; `senam`; `pencucian-baju`; `peminjaman-buku`
+- 6 categories seeded in `ServiceCategorySeeder` (idempotent, keyed by `slug`); each has a dedicated page/controller
+- Page→controller→slug(s): `video-call`; `perawatan` (one controller, `?tab=` flips between `potong-rambut`, `potong-kuku`); `pemeriksaan-kesehatan`; `layanan-laundry`; `peminjaman-buku`
 - `service_categories.tipe_layanan` is enum `harian`/`mingguan`
-- `MonitoringController::setStatus()` does application-level find-or-create by WBP+category+date (not a database-level upsert); powers perawatan, alat-ibadah, senam, pencucian
+- `MonitoringController::setStatus()` does application-level find-or-create by WBP+category+date (not a database-level upsert); powers perawatan, pemeriksaan-kesehatan, layanan-laundry
 - video-call posts to the generic `monitoring.store`; peminjaman-buku has its own `store` that writes `BorrowBook` **plus** a `MonitoringLog` row
 - Per-category status options come from `MonitoringStatus::optionsFor($slug)`; fulfillment check is `MonitoringLog::isTerpenuhi()`
 - **No unique constraint** on `monitoring_logs` for (wbp_id, category_id, tanggal) — uniqueness enforced in app code only

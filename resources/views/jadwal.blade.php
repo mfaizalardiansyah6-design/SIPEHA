@@ -11,7 +11,7 @@
         <div class="card card-padding xl:col-span-2">
             <div class="mb-4">
                 <h2>Kalender Sesi Layanan</h2>
-                <p class="text-sm text-muted mt-0.5">Jumlah sesi tercatat per tanggal (± 45 hari)</p>
+                <p class="text-sm text-muted mt-0.5">Jumlah sesi tercatat per tanggal (± 30 hari)</p>
             </div>
 
             <div x-data="fullCalendar('calendar-events')" class="fc-custom">
