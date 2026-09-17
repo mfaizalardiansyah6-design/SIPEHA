@@ -4,9 +4,9 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Policies\PetugasPolicy;
+use App\Services\ImageUrl;
 use App\Services\Settings;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View as ViewInstance;
@@ -43,9 +43,7 @@ class AppServiceProvider extends ServiceProvider
             $instansi = array_merge(Settings::defaults()['instansi'], $settings->get('instansi', Settings::defaults()['instansi']));
 
             $view->with('instansi', $instansi);
-            $view->with('instansiLogoUrl', $instansi['logo']
-                ? Storage::disk('public')->url($instansi['logo'])
-                : null);
+            $view->with('instansiLogoUrl', ImageUrl::url($instansi['logo']));
 
             $appearance = array_merge(Settings::defaults()['tampilan'], $settings->get('tampilan', Settings::defaults()['tampilan']));
 

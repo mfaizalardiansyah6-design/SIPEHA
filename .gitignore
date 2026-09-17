@@ -18,6 +18,9 @@
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage
+# Upload publik (isi runtime) — hanya .htaccess yang ikut tersimpan
+/public/uploads/*
+!/public/uploads/.htaccess
 /storage/*.key
 /storage/pail
 /vendor

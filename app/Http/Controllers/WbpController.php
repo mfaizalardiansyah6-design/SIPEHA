@@ -8,10 +8,10 @@ use App\Http\Requests\UpdateWbpRequest;
 use App\Models\ServiceCategory;
 use App\Models\Wbp;
 use App\Services\AuditLogger;
+use App\Services\ImageUrl;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class WbpController extends Controller
@@ -76,7 +76,7 @@ class WbpController extends Controller
         $data = $request->validated();
         $data['nik_hash'] = Wbp::hashNik($data['nik']);
         $data['foto_url'] = $request->hasFile('foto')
-            ? $request->file('foto')->store('uploads/wbp', 'public')
+            ? $request->file('foto')->store('wbp', 'uploads')
             : null;
 
         $wbp = Wbp::create($data);
@@ -110,10 +110,8 @@ class WbpController extends Controller
         }
 
         if ($request->hasFile('foto')) {
-            if ($wbp->foto_url) {
-                Storage::disk('public')->delete($wbp->foto_url);
-            }
-            $data['foto_url'] = $request->file('foto')->store('uploads/wbp', 'public');
+            ImageUrl::delete($wbp->foto_url);
+            $data['foto_url'] = $request->file('foto')->store('wbp', 'uploads');
         }
 
         $wbp->update($data);

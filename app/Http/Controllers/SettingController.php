@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Services\AuditLogger;
+use App\Services\ImageUrl;
 use App\Services\Settings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class SettingController extends Controller
@@ -14,9 +14,7 @@ class SettingController extends Controller
     public function index(): View
     {
         $settings = app(Settings::class)->all();
-        $logoUrl = $settings['instansi']['logo']
-            ? Storage::disk('public')->url($settings['instansi']['logo'])
-            : null;
+        $logoUrl = ImageUrl::url($settings['instansi']['logo']);
 
         return view('pengaturan.index', compact('settings', 'logoUrl'));
     }
@@ -33,7 +31,7 @@ class SettingController extends Controller
 
         if ($request->hasFile('logo')) {
             $request->validate(['logo' => ['image', 'mimes:png,jpg,jpeg,webp', 'max:2048']]);
-            $data['logo'] = $request->file('logo')->store('uploads/settings', 'public');
+            $data['logo'] = $request->file('logo')->store('settings', 'uploads');
         }
 
         $data = array_intersect_key($data, $defaults[$group]);

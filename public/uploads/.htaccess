@@ -1,0 +1,7 @@
+# Cegah penelusuran direktori upload
+Options -Indexes
+
+# Blok eksekusi skrip yang tidak sengaja ter-upload (Apache 2.4)
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phar|pl|py|cgi|asp|aspx|sh)$">
+    Require all denied
+</FilesMatch>

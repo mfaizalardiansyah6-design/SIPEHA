@@ -116,7 +116,7 @@ class UserSettingsTest extends TestCase
 
     public function test_user_can_upload_profile_photo(): void
     {
-        Storage::fake('public');
+        Storage::fake('uploads');
 
         $user = User::factory()->create();
 
@@ -129,7 +129,7 @@ class UserSettingsTest extends TestCase
             ->assertSessionHas('success');
 
         $this->assertNotNull($user->fresh()->profile_photo_path);
-        Storage::disk('public')->assertExists($user->fresh()->profile_photo_path);
+        Storage::disk('uploads')->assertExists($user->fresh()->profile_photo_path);
 
         $this->assertDatabaseHas('audit_logs', [
             'user_id' => $user->id,

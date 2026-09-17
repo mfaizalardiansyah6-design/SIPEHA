@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\ImageUrl;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -59,11 +59,9 @@ class UserSettingsController extends Controller
 
         $user = $request->user();
 
-        if ($user->profile_photo_path) {
-            Storage::disk('public')->delete($user->profile_photo_path);
-        }
+        ImageUrl::delete($user->profile_photo_path);
 
-        $path = $validated['photo']->store('uploads/profile-photos', 'public');
+        $path = $validated['photo']->store('profile-photos', 'uploads');
 
         $user->update(['profile_photo_path' => $path]);
 

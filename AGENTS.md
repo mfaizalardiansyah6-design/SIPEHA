@@ -67,7 +67,9 @@ New-Item -ItemType File -Path "database\database.sqlite"
 - `/laporan/excel` — PhpSpreadsheet, `/laporan/pdf` — DomPDF
 
 ### File Uploads
-- `public` disk: WBP photos `uploads/wbp/`, profile photos `uploads/profile-photos/`, settings logo `uploads/settings/`
+- **`uploads` disk** (root `public/uploads/`, url `/uploads`) stores public images: WBP photos `wbp/`, profile photos `profile-photos/`, settings logo `settings/` — no `storage:link`/symlink needed (shared-host friendly)
+- URL & delete via `App\Services\ImageUrl::url()/delete()`; helper normalizes legacy `uploads/...` DB paths, so old rows keep working without a DB migration
+- `public/uploads/.htaccess` blocks script execution; `.gitignore` keeps only that file
 
 ## Testing
 
