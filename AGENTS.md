@@ -52,6 +52,7 @@ New-Item -ItemType File -Path "database\database.sqlite"
 - `MonitoringController::setStatus()` does application-level find-or-create by WBP+category+date (not a database-level upsert); powers perawatan, pemeriksaan-kesehatan, layanan-laundry
 - video-call posts to the generic `monitoring.store`; peminjaman-buku has its own `store` that writes `BorrowBook` **plus** a `MonitoringLog` row
 - Per-category status options come from `MonitoringStatus::optionsFor($slug)`; fulfillment check is `MonitoringLog::isTerpenuhi()`
+- Pemeriksaan Kesehatan is intentionally simple: options are `Selesai`/`Belum` displayed as **Sudah**/**Belum** per selected date. `MonitoringStatus::labelKesehatan()` maps any non-`Belum` value (incl. legacy `Hadir`/`Tidak Hadir`/`Izin`) to `Sudah` — app-level only, no DB migration
 - A WBP's *current* status for a category is its **latest** log (e.g. `PerawatanController` groups logs by wbp then takes `->map->last()`) — used for "terpenuhi" progress badges
 - **No unique constraint** on `monitoring_logs` for (wbp_id, category_id, tanggal) — uniqueness enforced in app code only
 

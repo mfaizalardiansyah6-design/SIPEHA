@@ -90,6 +90,25 @@ class MonitoringTest extends TestCase
             ->assertSee($wbp->nama);
     }
 
+    public function test_pemeriksaan_kesehatan_shows_sudah_belum_status(): void
+    {
+        $done = Wbp::factory()->create();
+        $done->monitoringLogs()->create([
+            'user_id' => $this->petugas->id,
+            'category_id' => $this->category->id,
+            'status' => MonitoringStatus::Selesai,
+            'tanggal' => today(),
+        ]);
+
+        $pending = Wbp::factory()->create();
+
+        $this->actingAs($this->petugas)
+            ->get(route('monitoring.pemeriksaan-kesehatan'))
+            ->assertOk()
+            ->assertSee('Sudah: 1')
+            ->assertSee('Belum: 1');
+    }
+
     public function test_video_call_export_returns_xlsx(): void
     {
         $category = ServiceCategory::factory()->create(['slug' => 'video-call']);

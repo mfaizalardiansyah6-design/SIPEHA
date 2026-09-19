@@ -125,7 +125,7 @@
                     <td>{{ $log->tanggal->translatedFormat('d M Y') }}</td>
                     <td>{{ $log->wbp?->nama ?? '—' }}</td>
                     <td>{{ $log->category?->nama_layanan ?? '—' }}</td>
-                    <td>{{ $log->status->value }}</td>
+                    <td>{{ $log->category?->slug === 'pemeriksaan-kesehatan' ? $log->status->labelKesehatan() : $log->status->value }}</td>
                     <td>{{ $log->keterangan ?? '' }}</td>
                 </tr>
             @empty

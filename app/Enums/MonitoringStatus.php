@@ -30,9 +30,18 @@ enum MonitoringStatus: string
     public static function optionsFor(string $categorySlug): array
     {
         return match ($categorySlug) {
-            'pemeriksaan-kesehatan' => ['Hadir', 'Tidak Hadir', 'Izin'],
             'layanan-laundry' => ['Proses', 'Selesai'],
             default => ['Selesai', 'Belum'],
         };
+    }
+
+    /**
+     * Label sederhana Sudah/Belum untuk halaman Pemeriksaan Kesehatan.
+     * Hanya 'Belum' yang berarti belum diperiksa; nilai lain (termasuk
+     * data lama Hadir/Izin/Tidak Hadir) dianggap sudah ada data → 'Sudah'.
+     */
+    public function labelKesehatan(): string
+    {
+        return $this === self::Belum ? 'Belum' : 'Sudah';
     }
 }

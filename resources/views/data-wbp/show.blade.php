@@ -98,9 +98,15 @@
                                 <td class="table-td text-body">{{ $log->tanggal->translatedFormat('d M Y') }}</td>
                                 <td class="table-td text-body">{{ $log->waktu_mulai ?? '—' }}</td>
                                 <td class="table-td">
-                                    <span class="badge {{ $log->isTerpenuhi() ? 'badge-green' : ($log->status === App\Enums\MonitoringStatus::Dibatalkan ? 'badge-gray' : 'badge-orange') }}">
-                                        {{ $log->status->value }}
-                                    </span>
+                                    @php
+                                        $isKesehatan = $log->category?->slug === 'pemeriksaan-kesehatan';
+                                        $statusLabel = $isKesehatan ? $log->status->labelKesehatan() : $log->status->value;
+                                        $statusDone = $isKesehatan ? $statusLabel === 'Sudah' : $log->isTerpenuhi();
+                                        $statusColor = $statusDone
+                                            ? 'badge-green'
+                                            : ($log->status === App\Enums\MonitoringStatus::Dibatalkan ? 'badge-gray' : 'badge-orange');
+                                    @endphp
+                                    <span class="badge {{ $statusColor }}">{{ $statusLabel }}</span>
                                 </td>
                                 <td class="table-td text-muted">{{ $log->user?->name ?? '—' }}</td>
                             </tr>

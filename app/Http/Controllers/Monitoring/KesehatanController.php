@@ -30,17 +30,11 @@ class KesehatanController extends Controller
 
         $statusOptions = MonitoringStatus::optionsFor($category->slug);
 
-        $hadir = $logs->filter->isTerpenuhi()->count();
+        $sudah = $logs->filter(fn (MonitoringLog $log) => $log->status !== MonitoringStatus::Belum)->count();
         $total = $wbps->count();
-        $persen = $total > 0 ? (int) round(($hadir / $total) * 100) : 0;
+        $belum = $total - $sudah;
+        $persen = $total > 0 ? (int) round(($sudah / $total) * 100) : 0;
 
-        $distribusi = MonitoringLog::where('category_id', $category->id)
-            ->whereDate('tanggal', $tanggal)
-            ->selectRaw('status, count(*) as total')
-            ->groupBy('status')
-            ->orderByDesc('total')
-            ->get();
-
-        return view('monitoring.pemeriksaan-kesehatan', compact('category', 'wbps', 'logs', 'statusOptions', 'hadir', 'total', 'persen', 'tanggal', 'distribusi'));
+        return view('monitoring.pemeriksaan-kesehatan', compact('category', 'wbps', 'logs', 'statusOptions', 'sudah', 'belum', 'total', 'persen', 'tanggal'));
     }
 }
