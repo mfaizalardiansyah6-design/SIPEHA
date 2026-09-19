@@ -4,9 +4,9 @@
             <div class="w-full max-w-md">
                 <div class="flex items-center gap-3 mb-10">
                     @if (! empty($instansiLogoUrl))
-                        <img src="{{ $instansiLogoUrl }}" alt="{{ $instansi['nama'] }}" class="size-12 object-contain shrink-0">
+                        <img src="{{ $instansiLogoUrl }}" alt="{{ $instansi['nama'] }}" class="h-14 w-auto max-w-[200px] object-contain shrink-0 rounded-lg">
                     @else
-                        <div class="size-12 rounded-lg bg-primary flex items-center justify-center text-white text-base font-semibold overflow-hidden">
+                        <div class="size-14 rounded-lg bg-primary flex items-center justify-center text-white text-base font-semibold overflow-hidden">
                             {{ strtoupper(substr($instansi['nama'] ?? 'H', 0, 1)) }}
                         </div>
                     @endif
