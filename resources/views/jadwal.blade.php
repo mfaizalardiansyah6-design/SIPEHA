@@ -46,8 +46,8 @@
                                     <x-icon name="video-camera" class="w-4 h-4" />
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-semibold text-ink truncate">{{ $log->wbp->nama }}</p>
-                                    <p class="text-xs text-muted">{{ $log->category->nama_layanan }}</p>
+                                    <p class="text-sm font-semibold text-ink truncate">{{ $log->wbp?->nama ?? '—' }}</p>
+                                    <p class="text-xs text-muted">{{ $log->category?->nama_layanan ?? '—' }}</p>
                                 </div>
                                 <span class="badge shrink-0 {{ $log->isTerpenuhi() ? 'badge-green' : 'badge-orange' }}">{{ $log->status->value }}</span>
                             </div>
@@ -61,8 +61,8 @@
                 <dl class="space-y-2 text-sm">
                     @foreach ($todayLogs->take(4) as $log)
                         <div class="flex items-center justify-between gap-3">
-                            <dt class="text-body truncate">{{ $log->wbp->nama }}</dt>
-                            <dd class="text-muted shrink-0">{{ $log->category->nama_layanan }}</dd>
+                            <dt class="text-body truncate">{{ $log->wbp?->nama ?? '—' }}</dt>
+                            <dd class="text-muted shrink-0">{{ $log->category?->nama_layanan ?? '—' }}</dd>
                         </div>
                     @endforeach
                 </dl>

@@ -13,11 +13,13 @@ class JadwalController extends Controller
         $tanggal = $request->date('tanggal')?->toDateString() ?? today()->toDateString();
 
         $todayLogs = MonitoringLog::with(['wbp', 'category'])
+            ->whereHas('wbp')
             ->whereDate('tanggal', $tanggal)
             ->orderByRaw('waktu_mulai IS NULL, waktu_mulai ASC')
             ->get();
 
         $events = MonitoringLog::selectRaw('tanggal, count(*) as total')
+            ->whereHas('wbp')
             ->whereDate('tanggal', '>=', today()->subDays(30))
             ->whereDate('tanggal', '<=', today()->addDays(30))
             ->groupBy('tanggal')

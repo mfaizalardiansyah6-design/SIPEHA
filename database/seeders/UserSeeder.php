@@ -11,10 +11,10 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
-            ['nip' => 'admin'],
+            ['email' => 'admin@simhak.test'],
             [
                 'name' => 'Administrator',
-                'email' => 'admin@simhak.test',
+                'nip' => 'admin',
                 'jabatan' => 'Kepala Lembaga',
                 'role' => UserRole::Admin,
                 'password' => 'password',

@@ -109,6 +109,31 @@ class MonitoringTest extends TestCase
             ->assertSee('Belum: 1');
     }
 
+    public function test_feature_pages_survive_deleted_wbp(): void
+    {
+        $videoCategory = ServiceCategory::factory()->create(['slug' => 'video-call']);
+        $wbp = Wbp::factory()->create();
+        $wbp->monitoringLogs()->create([
+            'user_id' => $this->petugas->id,
+            'category_id' => $videoCategory->id,
+            'status' => MonitoringStatus::Selesai,
+            'tanggal' => today(),
+            'waktu_mulai' => '10:00',
+        ]);
+
+        $wbp->delete();
+
+        $this->actingAs($this->petugas)
+            ->get(route('monitoring.video-call'))
+            ->assertOk()
+            ->assertDontSee($wbp->nama);
+
+        $this->actingAs($this->petugas)
+            ->get(route('jadwal'))
+            ->assertOk()
+            ->assertDontSee($wbp->nama);
+    }
+
     public function test_video_call_export_returns_xlsx(): void
     {
         $category = ServiceCategory::factory()->create(['slug' => 'video-call']);

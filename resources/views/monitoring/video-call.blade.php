@@ -68,8 +68,8 @@
                         @forelse ($logs as $log)
                             <tr class="hover:bg-canvas-parchment/50 transition-colors">
                                 <td class="table-td">
-                                    <p class="font-semibold text-ink truncate max-w-[220px]">{{ $log->wbp->nama }}</p>
-                                    <p class="text-xs text-muted">Blok {{ $log->wbp->blok_kamar }}</p>
+                                    <p class="font-semibold text-ink truncate max-w-[220px]">{{ $log->wbp?->nama ?? '—' }}</p>
+                                    <p class="text-xs text-muted">Blok {{ $log->wbp?->blok_kamar ?? '—' }}</p>
                                 </td>
                                 <td class="table-td text-body">{{ $log->waktu_mulai ?? '—' }}</td>
                                 <td class="table-td">

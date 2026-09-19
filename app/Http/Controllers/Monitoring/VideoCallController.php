@@ -21,6 +21,7 @@ class VideoCallController extends Controller
         $blok = $request->string('blok')->trim()->value();
 
         $logs = MonitoringLog::with(['wbp', 'user'])
+            ->whereHas('wbp')
             ->where('category_id', $category->id)
             ->whereDate('tanggal', $tanggal)
             ->when($blok !== '', fn ($query) => $query->whereHas('wbp', fn ($query) => $query->where('blok_kamar', $blok)))
@@ -48,6 +49,7 @@ class VideoCallController extends Controller
         $tanggal = $request->date('tanggal')?->toDateString() ?? today()->toDateString();
 
         $logs = MonitoringLog::with('wbp')
+            ->whereHas('wbp')
             ->where('category_id', $category->id)
             ->whereDate('tanggal', $tanggal)
             ->orderBy('waktu_mulai')
