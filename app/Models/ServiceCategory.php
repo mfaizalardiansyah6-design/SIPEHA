@@ -20,4 +20,14 @@ class ServiceCategory extends Model
     {
         return $this->hasMany(MonitoringLog::class);
     }
+
+    /**
+     * Label tampilan layanan. Slug lama `video-call` tetap dipakai sebagai
+     * identitas internal & relasi, tetapi ditampilkan sebagai "Kunjungan".
+     * Data database tidak diubah agar kompatibel dengan data lama.
+     */
+    protected function getNamaLayananAttribute(?string $value): ?string
+    {
+        return $this->slug === 'video-call' ? 'Kunjungan' : $value;
+    }
 }

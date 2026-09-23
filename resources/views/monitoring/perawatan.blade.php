@@ -4,27 +4,33 @@
 
         <x-slot:actions>
             @php $tabs = ['potong-rambut' => 'Potong Rambut', 'potong-kuku' => 'Potong Kuku']; @endphp
-            <div class="flex items-center gap-1 rounded-lg bg-ink/5 p-1 overflow-x-auto max-w-full">
-                @foreach ($tabs as $slug => $label)
-                    <a href="{{ route('monitoring.perawatan', ['tab' => $slug]) }}"
-                       class="px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-colors {{ $tab === $slug ? 'bg-surface text-ink border border-line' : 'text-muted hover:text-body' }}">
-                        {{ $label }}
-                    </a>
-                @endforeach
+            <div class="flex flex-wrap items-center justify-end gap-2">
+                <form method="GET" action="{{ route('monitoring.perawatan') }}" class="flex items-center gap-2">
+                    <input type="hidden" name="tab" value="{{ $tab }}">
+                    <input type="date" name="tanggal" value="{{ $tanggal }}" class="form-input w-full sm:!w-44" onchange="this.form.submit()">
+                </form>
+                <div class="flex items-center gap-1 rounded-lg bg-ink/5 p-1 overflow-x-auto max-w-full">
+                    @foreach ($tabs as $slug => $label)
+                        <a href="{{ route('monitoring.perawatan', ['tab' => $slug, 'tanggal' => $tanggal]) }}"
+                           class="px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-colors {{ $tab === $slug ? 'bg-surface text-ink border border-line' : 'text-muted hover:text-body' }}">
+                            {{ $label }}
+                        </a>
+                    @endforeach
+                </div>
             </div>
         </x-slot:actions>
     </x-page-header>
 
     <div class="card card-padding mb-6">
-        <div class="flex flex-wrap items-center gap-6">
-            <div class="flex-1 min-w-56">
-                <div class="flex items-end justify-between mb-2">
-                    <div>
-                        <p class="text-sm font-semibold text-ink">{{ $category->nama_layanan }}</p>
-                        <p class="text-xs text-muted mt-0.5">Status terakhir per WBP</p>
+<div class="flex flex-wrap items-center gap-6">
+                <div class="flex-1 min-w-56">
+                    <div class="flex items-end justify-between mb-2">
+                        <div>
+                            <p class="text-sm font-semibold text-ink">{{ $category->nama_layanan }}</p>
+                            <p class="text-xs text-muted mt-0.5">Status per {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d M Y') }}</p>
+                        </div>
+                        <span class="text-lg font-semibold text-ink">{{ $persen }}%</span>
                     </div>
-                    <span class="text-lg font-semibold text-ink">{{ $persen }}%</span>
-                </div>
                 <div class="h-2 rounded-full bg-ink/5 overflow-hidden">
                     <div class="h-full rounded-full {{ $persen >= 75 ? 'bg-teal-brand' : ($persen >= 40 ? 'bg-primary' : 'bg-orange-500') }}" style="width: {{ $persen }}%"></div>
                 </div>
@@ -53,7 +59,7 @@
                     <tr class="border-b border-line bg-canvas-parchment/70">
                         <th class="table-th">WBP</th>
                         <th class="table-th">Blok</th>
-                        <th class="table-th">Status Terakhir</th>
+                        <th class="table-th">Status {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d M Y') }}</th>
                         <th class="table-th">Perbarui Status</th>
                     </tr>
                 </thead>
@@ -81,7 +87,7 @@
                                     @csrf
                                     <input type="hidden" name="wbp_id" value="{{ $wbp->id }}">
                                     <input type="hidden" name="category_id" value="{{ $category->id }}">
-                                    <input type="hidden" name="tanggal" value="{{ now()->toDateString() }}">
+                                    <input type="hidden" name="tanggal" value="{{ $tanggal }}">
                                     <select name="status" class="form-input !w-32 !py-1.5 text-xs" onchange="this.form.submit()">
                                         <option value="">— Pilih —</option>
                                         @foreach ($statusOptions as $option)

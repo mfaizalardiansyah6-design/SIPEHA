@@ -30,14 +30,15 @@ New-Item -ItemType File -Path "database\database.sqlite"
 ### Roles & Middleware
 - **Admin** (`admin`): Full access — CRUD WBP, petugas, settings, audit logs
 - **User** (`user`): Read-only data, monitoring operations only
-- `role:admin` middleware is a custom `App\Http\Middleware\RoleMiddleware` (variadic roles, checks `$user->role->value`)
+- `role:admin` middleware is a custom `App\Http\Middleware\RoleMiddleware` (variadic roles, checks `$user->role->value` against the `App\Enums\UserRole` backed enum)
 - All auth routes in `routes/web.php`; auth scaffolding in `routes/auth.php`
 
 ### Models & IDs
 - **UUID primary key** (`HasUuids`): `Wbp`, `User`, `MonitoringLog`, `BorrowBook`
 - **Integer auto-increment** (no `HasUuids`): `ServiceCategory`, `Setting`, `AuditLog`
 - `Wbp` and `MonitoringLog` use `SoftDeletes` (queries auto-exclude deleted rows)
-- **Gotcha**: `wbp.agama` is a DB `enum ['Islam','Kristen','Katolik','Hindu','Budha']` (one `d`), but `StoreWbpRequest` and `WbpFactory` allow `'Buddha'`/`'Konghucu'`. Creating/seeding a WBP with those on strict MySQL fails (`Data truncated for column 'agama'`) — and `WbpSeeder` uses the factory, so a fresh `migrate --seed` on MySQL is virtually guaranteed to fail; SQLite (tests) doesn't enforce it.
+- **Enums**: backed string enums live in `app/Enums/` — `UserRole` (`admin`/`user`), `WbpStatus` (`Aktif`/`Non-Aktif`), `MonitoringStatus`, `BorrowStatus` (`Dipinjam`/`Dikembalikan`). Status-ish columns (`users.role`, `wbp.status`, `monitoring_logs.status`) are DB enums mirroring them; validate with `Rule::enum(...)`, never hand-rolled `in:` rules
+- **Gotcha (fixed)**: `wbp.agama` was originally a MySQL enum `['Islam','Kristen','Katolik','Hindu','Budha']` (one `d`), but migration `2026_08_09_065201_add_contact_fields_to_wbp_table` widens it to `['Islam','Kristen','Katolik','Hindu','Buddha','Konghucu']` and backfills `Budha`→`Buddha`, so it now matches `StoreWbpRequest`/`WbpFactory`. `migrate --seed` works on fresh MySQL; only pre-existing DBs that never ran that migration still hit `Data truncated for column 'agama'`
 
 ### NIK Encryption
 - `nik` field encrypted at rest (Eloquent cast)
@@ -51,9 +52,14 @@ New-Item -ItemType File -Path "database\database.sqlite"
 - `service_categories.tipe_layanan` is enum `harian`/`mingguan`
 - `MonitoringController::setStatus()` does application-level find-or-create by WBP+category+date (not a database-level upsert); powers perawatan, pemeriksaan-kesehatan, layanan-laundry
 - video-call posts to the generic `monitoring.store`; peminjaman-buku has its own `store` that writes `BorrowBook` **plus** a `MonitoringLog` row
+- **`video-call` is displayed as "Kunjungan"** via the accessor `ServiceCategory::getNamaLayananAttribute()` (slug + `nama_layanan` DB value untouched; all relations via `category_id`). Never change the DB value for that slug — the accessor is the single source of display truth. When eager-loading `category` with a partial select, include `slug` (e.g. `with('category:id,nama_layanan,slug')`) or the accessor can't map
+- Editing a session (status/tanggal/waktu/keterangan) goes to `PATCH /monitoring/{id}` → `monitoring.update` (`UpdateMonitoringRequest`, direct `$log->update()`, no upsert); the quick status dropdown uses `monitoring.update-status`
+- WBP search combobox for "Catat Sesi Baru" (Kunjungan form) hits `GET /monitoring/wbp/search` → `monitoring.wbp-search` (Alpine `wbpSearch` component in `resources/js/app.js`, min 2 chars, only `Aktif` WBP, limit 20). Don't reintroduce a full-WBP `<select>`
 - Per-category status options come from `MonitoringStatus::optionsFor($slug)`; fulfillment check is `MonitoringLog::isTerpenuhi()`
 - Pemeriksaan Kesehatan is intentionally simple: options are `Selesai`/`Belum` displayed as **Sudah**/**Belum** per selected date. `MonitoringStatus::labelKesehatan()` maps any non-`Belum` value (incl. legacy `Hadir`/`Tidak Hadir`/`Izin`) to `Sudah` — app-level only, no DB migration
-- A WBP's *current* status for a category is its **latest** log (e.g. `PerawatanController` groups logs by wbp then takes `->map->last()`) — used for "terpenuhi" progress badges
+- Perawatan Diri & Kesehatan & Laundry use a **global date picker** (`?tab=...&tanggal=YYYY-MM-DD`); status is upserted per (wbp, category, tanggal) via `monitoring.set-status`. Don't revert the hidden `tanggal` to `now()` — the selected date drives the row
+- A WBP's *current* status for a category is its **latest** log (see `Wbp::progressHak()` / `DashboardController`) — used for "terpenuhi" progress badges. **Perawatan Diri is the exception: it's date-scoped** (logs fetched `whereDate('tanggal', $tanggal)`, keyed by `wbp_id`), not latest-log
+- Every monitoring index page (video-call, perawatan, pemeriksaan-kesehatan, layanan-laundry, peminjaman-buku) only lists **active** WBP: `Wbp::where('status', WbpStatus::Aktif->value)->orderBy('nama')` — replicate this filter in any new monitoring page
 - **No unique constraint** on `monitoring_logs` for (wbp_id, category_id, tanggal) — uniqueness enforced in app code only
 
 ### Settings

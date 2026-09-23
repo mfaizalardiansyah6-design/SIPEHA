@@ -19,11 +19,16 @@ class VideoCallController extends Controller
         $category = ServiceCategory::where('slug', 'video-call')->firstOrFail();
         $tanggal = $request->date('tanggal')?->toDateString() ?? today()->toDateString();
         $blok = $request->string('blok')->trim()->value();
+        $q = $request->string('q')->trim()->value();
 
         $logs = MonitoringLog::with(['wbp', 'user'])
             ->whereHas('wbp')
             ->where('category_id', $category->id)
             ->whereDate('tanggal', $tanggal)
+            ->when($q !== '', fn ($query) => $query->whereHas('wbp', fn ($query) => $query->where(function ($query) use ($q) {
+                $query->where('nama', 'like', "%{$q}%")
+                    ->orWhere('no_register', 'like', "%{$q}%");
+            })))
             ->when($blok !== '', fn ($query) => $query->whereHas('wbp', fn ($query) => $query->where('blok_kamar', $blok)))
             ->orderByRaw('waktu_mulai IS NULL, waktu_mulai ASC')
             ->paginate(12)
@@ -38,9 +43,8 @@ class VideoCallController extends Controller
         $belum = $daily->count() - $selesai;
 
         $blokList = Wbp::select('blok_kamar')->distinct()->orderBy('blok_kamar')->pluck('blok_kamar');
-        $wbps = Wbp::where('status', WbpStatus::Aktif->value)->orderBy('nama')->get();
 
-        return view('monitoring.video-call', compact('category', 'logs', 'tanggal', 'blok', 'blokList', 'wbps', 'totalWbp', 'selesai', 'belum'));
+        return view('monitoring.video-call', compact('category', 'logs', 'tanggal', 'blok', 'q', 'blokList', 'totalWbp', 'selesai', 'belum'));
     }
 
     public function export(Request $request): BinaryFileResponse
@@ -65,10 +69,10 @@ class VideoCallController extends Controller
         ])->toArray();
 
         return app(ExcelExporter::class)->download(
-            "video-call-{$tanggal}.xlsx",
+            "kunjungan-{$tanggal}.xlsx",
             ['Nama WBP', 'No. Register', 'Blok', 'Waktu Mulai', 'Status', 'Keterangan'],
             $rows,
-            'Video Call',
+            'Kunjungan',
         );
     }
 }

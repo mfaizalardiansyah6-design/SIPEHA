@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Monitoring;
 
 use App\Enums\MonitoringStatus;
+use App\Enums\WbpStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreMonitoringRequest;
+use App\Http\Requests\UpdateMonitoringRequest;
 use App\Http\Requests\UpdateMonitoringStatusRequest;
 use App\Models\MonitoringLog;
+use App\Models\Wbp;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -28,6 +32,44 @@ class MonitoringController extends Controller
         $log->update($request->validated());
 
         return back()->with('success', 'Status berhasil diperbarui.');
+    }
+
+    public function update(UpdateMonitoringRequest $request, MonitoringLog $log): RedirectResponse
+    {
+        $log->update($request->validated());
+
+        return back()->with('success', 'Sesi berhasil diperbarui.');
+    }
+
+    /**
+     * Pencarian WBP untuk form "Catat Sesi Baru" (server-side, AJAX).
+     * Hanya WBP aktif yang dikembalikan, paling banyak 20 hasil.
+     */
+    public function searchWbp(Request $request): JsonResponse
+    {
+        $q = $request->string('q')->trim()->value();
+
+        if (mb_strlen($q) < 2) {
+            return response()->json(['results' => []]);
+        }
+
+        $wbps = Wbp::where('status', WbpStatus::Aktif->value)
+            ->where(function ($query) use ($q) {
+                $query->where('nama', 'like', "%{$q}%")
+                    ->orWhere('no_register', 'like', "%{$q}%")
+                    ->orWhere('blok_kamar', 'like', "%{$q}%");
+            })
+            ->orderBy('nama')
+            ->limit(20)
+            ->get(['id', 'nama', 'no_register', 'blok_kamar'])
+            ->map(fn (Wbp $wbp) => [
+                'id' => $wbp->id,
+                'nama' => $wbp->nama,
+                'no_register' => $wbp->no_register,
+                'blok_kamar' => $wbp->blok_kamar,
+            ]);
+
+        return response()->json(['results' => $wbps]);
     }
 
     /**

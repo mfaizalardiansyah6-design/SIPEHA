@@ -64,8 +64,8 @@
                     @if ($isVideo)
                         <span class="absolute left-0 inset-y-0 w-[3px] bg-primary"></span>
                     @endif
-                    <x-icon name="video-camera" class="w-5 h-5 shrink-0" />
-                    <span>Video Call</span>
+                    <x-icon name="phone" class="w-5 h-5 shrink-0" />
+                    <span>Kunjungan</span>
                 </a>
 
                 @php

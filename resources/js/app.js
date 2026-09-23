@@ -113,6 +113,91 @@ Alpine.data('fullCalendar', (sourceId, extraEventsId) => ({
     },
 }));
 
+Alpine.data('wbpSearch', (searchUrl) => ({
+    query: '',
+    results: [],
+    selected: null,
+    open: false,
+    loading: false,
+    error: '',
+    timer: null,
+
+    search() {
+        clearTimeout(this.timer);
+
+        if (this.selected) {
+            return;
+        }
+
+        this.timer = setTimeout(async () => {
+            const term = this.query.trim();
+
+            if (term.length < 2) {
+                this.results = [];
+                this.open = false;
+                return;
+            }
+
+            this.loading = true;
+            this.error = '';
+
+            try {
+                const res = await fetch(`${searchUrl}?q=${encodeURIComponent(term)}`, {
+                    headers: { Accept: 'application/json' },
+                });
+                const data = await res.json();
+                this.results = data.results || [];
+                this.open = true;
+            } catch (e) {
+                this.error = 'Gagal memuat data WBP.';
+                this.results = [];
+                this.open = false;
+            } finally {
+                this.loading = false;
+            }
+        }, 300);
+    },
+
+    select(item) {
+        this.selected = item;
+        this.query = item.nama;
+        this.results = [];
+        this.open = false;
+    },
+
+    clear() {
+        this.selected = null;
+        this.query = '';
+        this.results = [];
+        this.open = false;
+    },
+}));
+
+Alpine.data('editSesi', (statusOptions) => ({
+    show: false,
+    action: '',
+    statusOptions,
+    form: {
+        status: 'Selesai',
+        tanggal: '',
+        waktu_mulai: '',
+        keterangan: '',
+    },
+
+    open({ action, status, tanggal, waktu_mulai, keterangan }) {
+        this.action = action;
+        this.form.status = status;
+        this.form.tanggal = tanggal;
+        this.form.waktu_mulai = waktu_mulai || '';
+        this.form.keterangan = keterangan || '';
+        this.show = true;
+    },
+
+    close() {
+        this.show = false;
+    },
+}));
+
 Alpine.data('confirmModal', () => ({
     show: false,
     action: '',

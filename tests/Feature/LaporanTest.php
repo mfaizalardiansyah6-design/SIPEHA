@@ -39,7 +39,8 @@ class LaporanTest extends TestCase
         $this->actingAs($this->petugas)
             ->get(route('laporan.index'))
             ->assertOk()
-            ->assertSee('Video Call');
+            ->assertSee('Kunjungan')
+            ->assertDontSee('Video Call');
     }
 
     public function test_excel_export_downloads_file(): void

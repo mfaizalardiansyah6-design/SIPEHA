@@ -82,7 +82,7 @@ class DashboardController extends Controller
         $activeWbps = Wbp::where('status', WbpStatus::Aktif->value)
             ->select(['id', 'nama', 'blok_kamar', 'foto_url'])
             ->with(['monitoringLogs' => fn ($query) => $query
-                ->with('category:id,nama_layanan')
+                ->with('category:id,nama_layanan,slug')
                 ->select(['wbp_id', 'category_id', 'status', 'tanggal'])
                 ->orderBy('tanggal')])
             ->get();

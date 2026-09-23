@@ -7,7 +7,7 @@ Aplikasi **SIPEHA** (Sistem Informasi Pemasyarakatan) adalah aplikasi web berbas
 - **Manajemen Data WBP** — CRUD data warga binaan (dengan enkripsi NIK di database, foto, dan pencarian via hash NIK)
 - **Manajemen Petugas** — CRUD akun petugas dengan role `admin` / `user`
 - **Monitoring Layanan** — pencatatan harian untuk layanan:
-  - Video Call
+  - Kunjungan
   - Perawatan (potong rambut & potong kuku)
   - Pemeriksaan Kesehatan
   - Layanan Laundry

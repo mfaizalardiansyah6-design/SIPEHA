@@ -24,6 +24,7 @@ class PerawatanController extends Controller
         }
 
         $category = ServiceCategory::where('slug', $tab)->firstOrFail();
+        $tanggal = $request->date('tanggal')?->toDateString() ?? today()->toDateString();
 
         $wbps = Wbp::where('status', WbpStatus::Aktif->value)
             ->orderBy('nama')
@@ -31,16 +32,15 @@ class PerawatanController extends Controller
 
         $logs = MonitoringLog::where('category_id', $category->id)
             ->whereIn('wbp_id', $wbps->pluck('id'))
-            ->orderBy('tanggal')
+            ->whereDate('tanggal', $tanggal)
             ->get(['id', 'wbp_id', 'category_id', 'status', 'tanggal', 'keterangan'])
-            ->groupBy('wbp_id')
-            ->map->last();
+            ->keyBy('wbp_id');
 
         $statusOptions = MonitoringStatus::optionsFor($category->slug);
         $fulfilled = $logs->filter->isTerpenuhi()->count();
         $total = $wbps->count();
         $persen = $total > 0 ? (int) round(($fulfilled / $total) * 100) : 0;
 
-        return view('monitoring.perawatan', compact('tab', 'category', 'wbps', 'logs', 'statusOptions', 'fulfilled', 'total', 'persen'));
+        return view('monitoring.perawatan', compact('tab', 'category', 'wbps', 'logs', 'statusOptions', 'fulfilled', 'total', 'persen', 'tanggal'));
     }
 }

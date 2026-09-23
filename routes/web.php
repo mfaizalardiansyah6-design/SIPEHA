@@ -55,7 +55,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/monitoring', [MonitoringController::class, 'store'])->name('monitoring.store');
     Route::post('/monitoring/set-status', [MonitoringController::class, 'setStatus'])->name('monitoring.set-status');
+    Route::get('/monitoring/wbp/search', [MonitoringController::class, 'searchWbp'])->name('monitoring.wbp-search');
     Route::patch('/monitoring/{log}/status', [MonitoringController::class, 'updateStatus'])->name('monitoring.update-status');
+    Route::patch('/monitoring/{log}', [MonitoringController::class, 'update'])->name('monitoring.update');
     Route::delete('/monitoring/{log}', [MonitoringController::class, 'destroy'])->name('monitoring.destroy');
 
     Route::post('/monitoring/buku', [PeminjamanBukuController::class, 'store'])->name('monitoring.buku.store');
