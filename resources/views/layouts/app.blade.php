@@ -113,6 +113,19 @@
                     </div>
                 @endif
 
+                @if ($errors->any())
+                    <div class="mb-6 rounded-xl bg-red-500/10 text-red-600 px-4 py-3 text-sm">
+                        <div class="flex items-start gap-2">
+                            <x-icon name="exclamation-triangle" class="w-5 h-5 shrink-0" />
+                            <ul class="space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                @endif
+
                 {{ $slot }}
             </main>
 

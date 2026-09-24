@@ -18,9 +18,12 @@ class LaundryController extends Controller
         $category = ServiceCategory::where('slug', 'layanan-laundry')->firstOrFail();
         $tanggal = $request->date('tanggal')?->toDateString() ?? today()->toDateString();
 
+        $blok = $request->string('blok')->trim()->value();
+        $q = $request->string('q')->trim()->value();
+
         $wbps = Wbp::where('status', WbpStatus::Aktif->value)
             ->orderBy('nama')
-            ->get(['id', 'nama', 'no_register', 'blok_kamar', 'foto_url']);
+            ->get(['id', 'nama', 'no_register', 'blok_kamar']);
 
         $logs = MonitoringLog::where('category_id', $category->id)
             ->whereIn('wbp_id', $wbps->pluck('id'))
@@ -30,17 +33,26 @@ class LaundryController extends Controller
 
         $statusOptions = MonitoringStatus::optionsFor($category->slug);
 
-        $selesai = $logs->filter->isTerpenuhi()->count();
-        $total = $wbps->count();
-        $persen = $total > 0 ? (int) round(($selesai / $total) * 100) : 0;
+        $payload = $wbps->map(function (Wbp $wbp) use ($logs) {
+            $log = $logs->get($wbp->id);
 
-        $distribusi = MonitoringLog::where('category_id', $category->id)
-            ->whereDate('tanggal', $tanggal)
-            ->selectRaw('status, count(*) as total')
-            ->groupBy('status')
-            ->orderByDesc('total')
-            ->get();
+            return [
+                'id' => $wbp->id,
+                'nama' => $wbp->nama,
+                'no_register' => $wbp->no_register,
+                'blok_kamar' => $wbp->blok_kamar,
+                'status' => $log?->status->value ?? null,
+                'fulfilled' => $log instanceof MonitoringLog && $log->isTerpenuhi(),
+            ];
+        })->values();
 
-        return view('monitoring.laundry', compact('category', 'wbps', 'logs', 'statusOptions', 'selesai', 'total', 'persen', 'tanggal', 'distribusi'));
+        $blokList = $wbps->pluck('blok_kamar')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+
+        return view('monitoring.laundry', compact('category', 'statusOptions', 'payload', 'blokList', 'tanggal', 'blok', 'q'));
     }
 }

@@ -26,21 +26,38 @@ class PerawatanController extends Controller
         $category = ServiceCategory::where('slug', $tab)->firstOrFail();
         $tanggal = $request->date('tanggal')?->toDateString() ?? today()->toDateString();
 
+        $blok = $request->string('blok')->trim()->value();
+        $q = $request->string('q')->trim()->value();
+
         $wbps = Wbp::where('status', WbpStatus::Aktif->value)
             ->orderBy('nama')
-            ->get(['id', 'nama', 'no_register', 'blok_kamar', 'foto_url']);
+            ->get(['id', 'nama', 'no_register', 'blok_kamar']);
 
         $logs = MonitoringLog::where('category_id', $category->id)
             ->whereIn('wbp_id', $wbps->pluck('id'))
             ->whereDate('tanggal', $tanggal)
-            ->get(['id', 'wbp_id', 'category_id', 'status', 'tanggal', 'keterangan'])
+            ->get(['id', 'wbp_id', 'category_id', 'status', 'tanggal'])
             ->keyBy('wbp_id');
 
         $statusOptions = MonitoringStatus::optionsFor($category->slug);
-        $fulfilled = $logs->filter->isTerpenuhi()->count();
-        $total = $wbps->count();
-        $persen = $total > 0 ? (int) round(($fulfilled / $total) * 100) : 0;
 
-        return view('monitoring.perawatan', compact('tab', 'category', 'wbps', 'logs', 'statusOptions', 'fulfilled', 'total', 'persen', 'tanggal'));
+        $payload = $wbps->map(fn (Wbp $wbp) => [
+            'id' => $wbp->id,
+            'nama' => $wbp->nama,
+            'no_register' => $wbp->no_register,
+            'blok_kamar' => $wbp->blok_kamar,
+            'status' => $logs->get($wbp->id)?->status->value ?? null,
+            'fulfilled' => (bool) ($logs->get($wbp->id)?->isTerpenuhi() ?? false),
+            'log_date' => $logs->get($wbp->id)?->tanggal->translatedFormat('d M Y') ?? null,
+        ])->values();
+
+        $blokList = $wbps->pluck('blok_kamar')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+
+        return view('monitoring.perawatan', compact('tab', 'category', 'statusOptions', 'payload', 'blokList', 'tanggal', 'blok', 'q'));
     }
 }

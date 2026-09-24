@@ -173,6 +173,258 @@ Alpine.data('wbpSearch', (searchUrl) => ({
     },
 }));
 
+const blokWbpTable = (payload) => ({
+    wbps: payload.wbps,
+    blokList: payload.blokList,
+    setStatusUrl: payload.setStatusUrl,
+    categoryId: payload.categoryId,
+    tanggal: payload.tanggal,
+
+    blokQuery: '',
+    blokResults: [],
+    blokOpen: false,
+    selectedBlok: payload.selectedBlok || '',
+    wbpQuery: payload.wbpQuery || '',
+
+    filtered: [],
+    selesai: 0,
+    proses: 0,
+    total: 0,
+    persen: 0,
+    distribusi: [],
+
+    init() {
+        this.blokResults = [...this.blokList];
+        this.recount();
+    },
+
+    recount() {
+        const term = this.wbpQuery.trim().toLowerCase();
+
+        this.filtered = this.wbps.filter((w) => {
+            if (this.selectedBlok && w.blok_kamar !== this.selectedBlok) {
+                return false;
+            }
+            if (!term) {
+                return true;
+            }
+
+            return w.nama.toLowerCase().includes(term)
+                || w.no_register.toLowerCase().includes(term);
+        });
+
+        this.selesai = this.filtered.filter((w) => w.fulfilled).length;
+        this.total = this.filtered.length;
+        this.proses = this.total - this.selesai;
+        this.persen = this.total > 0
+            ? Math.round((this.selesai / this.total) * 100)
+            : 0;
+
+        const counts = {};
+
+        this.filtered.forEach((w) => {
+            if (w.status) {
+                counts[w.status] = (counts[w.status] || 0) + 1;
+            }
+        });
+
+        this.distribusi = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    },
+
+    filterBlok() {
+        const term = this.blokQuery.trim().toLowerCase();
+
+        this.blokResults = term
+            ? this.blokList.filter((b) => b.toLowerCase().includes(term))
+            : [...this.blokList];
+    },
+
+    selectBlok(blok) {
+        this.selectedBlok = blok;
+        this.blokQuery = '';
+        this.blokOpen = false;
+        this.recount();
+        this.syncUrlState();
+    },
+
+    clearBlok() {
+        this.selectedBlok = '';
+        this.blokQuery = '';
+        this.blokResults = [...this.blokList];
+        this.recount();
+        this.syncUrlState();
+    },
+
+    onWbpQuery() {
+        this.recount();
+        this.syncUrlState();
+    },
+
+    // Sinkronkan filter blok/WBP ke URL dan input tersembunyi header agar
+    // filter tetap bertahan saat petugas mengganti tanggal/tab.
+    syncUrlState() {
+        const params = new URLSearchParams(location.search);
+
+        const setParam = (key, value) => {
+            if (value) {
+                params.set(key, value);
+            } else {
+                params.delete(key);
+            }
+        };
+
+        setParam('blok', this.selectedBlok);
+        setParam('q', this.wbpQuery.trim());
+
+        history.replaceState(null, '', `${location.pathname}?${params.toString()}`);
+
+        const blokInput = document.querySelector('input[name="blok"]');
+        const qInput = document.querySelector('input[name="q"]');
+
+        if (blokInput) {
+            blokInput.value = this.selectedBlok;
+        }
+        if (qInput) {
+            qInput.value = this.wbpQuery.trim();
+        }
+
+        document.querySelectorAll('[data-tab-link]').forEach((a) => {
+            const href = new URL(a.href);
+            setParam('blok', this.selectedBlok);
+            setParam('q', this.wbpQuery.trim());
+            href.search = params.toString();
+            a.href = href.toString();
+        });
+    },
+});
+
+const blokWbpForm = (searchUrl, statusOptions, blokList) => ({
+    blokQuery: '',
+    blokResults: [...blokList],
+    blokOpen: false,
+    selectedBlok: '',
+
+    wbpQuery: '',
+    wbpResults: [],
+    wbpOpen: false,
+    selectedWbp: null,
+    loading: false,
+    error: '',
+    timer: null,
+
+    statusOptions,
+    status: statusOptions[0] || 'Proses',
+    blokError: false,
+    wbpError: false,
+
+    filterBlok() {
+        const term = this.blokQuery.trim().toLowerCase();
+
+        this.blokResults = term
+            ? blokList.filter((b) => b.toLowerCase().includes(term))
+            : [...blokList];
+    },
+
+    selectBlok(blok) {
+        this.selectedBlok = blok;
+        this.blokQuery = '';
+        this.blokOpen = false;
+        this.blokError = false;
+        this.wbpQuery = '';
+        this.wbpResults = [];
+        this.wbpOpen = false;
+        this.selectedWbp = null;
+        this.wbpError = false;
+    },
+
+    clearBlok() {
+        this.selectedBlok = '';
+        this.blokQuery = '';
+        this.blokResults = [...blokList];
+        this.wbpQuery = '';
+        this.wbpResults = [];
+        this.selectedWbp = null;
+        this.wbpError = false;
+    },
+
+    searchWbp() {
+        clearTimeout(this.timer);
+
+        if (!this.selectedBlok) {
+            this.wbpResults = [];
+            this.wbpOpen = false;
+
+            return;
+        }
+
+        if (this.selectedWbp) {
+            return;
+        }
+
+        this.timer = setTimeout(async () => {
+            const term = this.wbpQuery.trim();
+
+            if (term.length < 2) {
+                this.wbpResults = [];
+                this.wbpOpen = false;
+
+                return;
+            }
+
+            this.loading = true;
+            this.error = '';
+
+            try {
+                const res = await fetch(`${searchUrl}?q=${encodeURIComponent(term)}&blok=${encodeURIComponent(this.selectedBlok)}`, {
+                    headers: { Accept: 'application/json' },
+                });
+                const data = await res.json();
+                this.wbpResults = data.results || [];
+                this.wbpOpen = true;
+            } catch (e) {
+                this.error = 'Gagal memuat data WBP.';
+                this.wbpResults = [];
+                this.wbpOpen = false;
+            } finally {
+                this.loading = false;
+            }
+        }, 300);
+    },
+
+    selectWbp(item) {
+        this.selectedWbp = item;
+        this.wbpQuery = item.nama;
+        this.wbpResults = [];
+        this.wbpOpen = false;
+        this.wbpError = false;
+    },
+
+    clearWbp() {
+        this.selectedWbp = null;
+        this.wbpQuery = '';
+        this.wbpResults = [];
+        this.wbpOpen = false;
+    },
+
+    submit() {
+        this.blokError = !this.selectedBlok;
+        this.wbpError = !this.selectedWbp;
+
+        if (this.blokError || this.wbpError) {
+            return;
+        }
+
+        this.$refs.form.submit();
+    },
+});
+
+Alpine.data('laundryTable', blokWbpTable);
+Alpine.data('laundryForm', blokWbpForm);
+Alpine.data('perawatanTable', blokWbpTable);
+Alpine.data('perawatanForm', blokWbpForm);
+Alpine.data('kesehatanTable', blokWbpTable);
+Alpine.data('kesehatanForm', blokWbpForm);
+
 Alpine.data('editSesi', (statusOptions) => ({
     show: false,
     action: '',

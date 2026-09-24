@@ -48,12 +48,14 @@ class MonitoringController extends Controller
     public function searchWbp(Request $request): JsonResponse
     {
         $q = $request->string('q')->trim()->value();
+        $blok = $request->string('blok')->trim()->value();
 
         if (mb_strlen($q) < 2) {
             return response()->json(['results' => []]);
         }
 
         $wbps = Wbp::where('status', WbpStatus::Aktif->value)
+            ->when($blok !== '', fn ($query) => $query->where('blok_kamar', $blok))
             ->where(function ($query) use ($q) {
                 $query->where('nama', 'like', "%{$q}%")
                     ->orWhere('no_register', 'like', "%{$q}%")
@@ -85,6 +87,9 @@ class MonitoringController extends Controller
             'status' => ['required', Rule::enum(MonitoringStatus::class)],
             'tanggal' => ['required', 'date'],
             'keterangan' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'wbp_id.required' => 'Pilih WBP terlebih dahulu.',
+            'status.required' => 'Status wajib diisi.',
         ]);
 
         $log = MonitoringLog::where('wbp_id', $data['wbp_id'])
