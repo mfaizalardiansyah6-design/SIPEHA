@@ -73,6 +73,7 @@
             <div>
                 <x-input-label for="status" value="Status" />
                 <select id="status" name="status" class="form-input" required>
+                    <option value="">Pilih status</option>
                     @foreach ($statuses as $option)
                         <option value="{{ $option->value }}" @selected(old('status', $wbp?->status?->value) === $option->value)>
                             {{ $option->label() }}

@@ -12,6 +12,9 @@ class UniqueNik implements ValidationRule
 
     /**
      * Validasi keunikan NIK terhadap nilai hash, karena NIK disimpan terenkripsi.
+     *
+     * Dibedakan antara data WBP aktif yang masih terdaftar dan data yang
+     * sudah dihapus (soft delete), agar pesan yang ditampilkan jelas.
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -22,7 +25,19 @@ class UniqueNik implements ValidationRule
         }
 
         if ($query->exists()) {
-            $fail('validation.unique')->translate();
+            $fail('NIK sudah terdaftar. Silakan gunakan NIK yang berbeda.');
+
+            return;
+        }
+
+        $trashed = Wbp::onlyTrashed()->where('nik_hash', Wbp::hashNik((string) $value));
+
+        if ($this->ignoreId !== null) {
+            $trashed->whereKeyNot($this->ignoreId);
+        }
+
+        if ($trashed->exists()) {
+            $fail('NIK tersebut pernah digunakan pada data WBP yang telah dihapus. Silakan periksa data WBP terlebih dahulu.');
         }
     }
 }

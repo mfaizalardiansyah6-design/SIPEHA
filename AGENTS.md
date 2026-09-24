@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Laravel 13 app for managing WBP (Warga Binaan Pemasyarakatum) — Indonesian prison inmate data and monitoring services.
+Laravel 13 app for managing WBP (Warga Binaan Pemasyarakatan) — Indonesian prison inmate data and monitoring services.
 
 ## Commands
 
@@ -30,7 +30,8 @@ New-Item -ItemType File -Path "database\database.sqlite"
 ### Roles & Middleware
 - **Admin** (`admin`): Full access — CRUD WBP, petugas, settings, audit logs
 - **User** (`user`): Read-only data, monitoring operations only
-- `role:admin` middleware is a custom `App\Http\Middleware\RoleMiddleware` (variadic roles, checks `$user->role->value` against the `App\Enums\UserRole` backed enum)
+- `role:admin` middleware is a custom `App\Http\Middleware\RoleMiddleware` (variadic roles, checks `$user->role->value` against the `App\Enums\UserRole` backed enum); the `role` alias and the `ApplyAppSettings` web-prepend are registered in `bootstrap/app.php` (not `app/Http/Kernel.php`)
+- Login is a single `identity` field accepting **NIP or email** (`LoginRequest`, not Breeze's default email-only); attempt limit comes from the `sistem.login_attempts` setting
 - All auth routes in `routes/web.php`; auth scaffolding in `routes/auth.php`
 
 ### Models & IDs
@@ -93,7 +94,7 @@ New-Item -ItemType File -Path "database\database.sqlite"
 
 - Indonesian language for UI and flash messages
 - Form requests for validation (`StoreWbpRequest`, `UpdateWbpRequest`, etc.)
-- All routes in `routes/web.php` (no route files per resource)
+- All routes in `routes/web.php` (no route files per resource); the `data-petugas` resource is named `petugas.*` and binds the URL param `{user}` to `App\Models\User`
 - Frontend: Blade + Tailwind 4 + Alpine.js; ApexCharts/FullCalendar mount in Alpine components from hidden `<script>`-fed elements using `Js::from()` — the emitted JS is an expression (`JSON.parse('...')`), not raw JSON, and gets executed via `new Function('return (...)')()` (see `chart`/`fullCalendar` in `resources/js/app.js`)
 
 ## Laravel Boost
